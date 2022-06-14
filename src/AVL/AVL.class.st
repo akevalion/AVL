@@ -2,7 +2,7 @@
 AVL https://en.wikipedia.org/wiki/AVL_tree
 "
 Class {
-	#name : #RSAVL,
+	#name : #AVL,
 	#superclass : #Collection,
 	#instVars : [
 		'root'
@@ -11,9 +11,9 @@ Class {
 }
 
 { #category : #adding }
-RSAVL >> add: newObject [ 
+AVL >> add: newObject [ 
 	root isNilNode
-		ifTrue: [ root := RSAVLNode with: newObject ]
+		ifTrue: [ root := AVLNode with: newObject ]
 		ifFalse: [ | path |
 			path := OrderedCollection with: nil -> root.
 			root add: newObject path: path.
@@ -22,7 +22,7 @@ RSAVL >> add: newObject [
 ]
 
 { #category : #accessing }
-RSAVL >> allChildren [
+AVL >> allChildren [
 	| list |
 	list := OrderedCollection new.
 	self root withAllChildren: list.
@@ -30,7 +30,7 @@ RSAVL >> allChildren [
 ]
 
 { #category : #private }
-RSAVL >> balance: index path: aCollection [ 
+AVL >> balance: index path: aCollection [ 
 	| x y z a b c |
 	z := aCollection at: index.
 	y := aCollection at: index + 1.
@@ -50,7 +50,7 @@ RSAVL >> balance: index path: aCollection [
 ]
 
 { #category : #private }
-RSAVL >> balanceZ: z y: y x: x [
+AVL >> balanceZ: z y: y x: x [
 	| a b c |
 	c := z value.
 	b := y value.
@@ -67,7 +67,7 @@ RSAVL >> balanceZ: z y: y x: x [
 ]
 
 { #category : #private }
-RSAVL >> checkPath: aCollection [ 
+AVL >> checkPath: aCollection [ 
 	aCollection size < 3 ifTrue: [ ^ self ].
 	(1 to: aCollection size - 2) reverseDo: [ :index |
 		| assoc |
@@ -80,7 +80,7 @@ RSAVL >> checkPath: aCollection [
 ]
 
 { #category : #private }
-RSAVL >> checkRemovingPath: path [
+AVL >> checkRemovingPath: path [
 	path reverseDo: [ :node | 
 		node isBalanced ifFalse: [ | z y x |
 			z := node.
@@ -89,8 +89,8 @@ RSAVL >> checkRemovingPath: path [
 			self balanceZ: node y: y x: x ] ].
 ]
 
-{ #category : #'as yet unclassified' }
-RSAVL >> createCanvas [
+{ #category : #inspector }
+AVL >> createCanvas [
 	| canvas children |
 	canvas := RSCanvas new.
 	children := self allChildren collect: [ :child | self createNode: child ].
@@ -106,8 +106,8 @@ RSAVL >> createCanvas [
 	^ canvas
 ]
 
-{ #category : #'as yet unclassified' }
-RSAVL >> createNode: node [ 
+{ #category : #inspector }
+AVL >> createNode: node [ 
 	| label w h back |
 	label := RSLabel new 
 		text: node contents asString;
@@ -131,64 +131,64 @@ RSAVL >> createNode: node [
 ]
 
 { #category : #enumerating }
-RSAVL >> do: aBlock [ 
+AVL >> do: aBlock [ 
 	root do: aBlock
 ]
 
 { #category : #public }
-RSAVL >> height [
+AVL >> height [
 	^ root height
 ]
 
 { #category : #testing }
-RSAVL >> includes: anObject [
+AVL >> includes: anObject [
 	anObject ifNil: [ ^ nil ].
 	^ (self search: anObject) notNil
 ]
 
 { #category : #initialization }
-RSAVL >> initialize [
+AVL >> initialize [
 	super initialize.
-	root := RSAVLNilNode new.
+	root := AVLNilNode new.
 ]
 
-{ #category : #'as yet unclassified' }
-RSAVL >> inspectorCanvas [
+{ #category : #inspector }
+AVL >> inspectorCanvas [
 	<inspectorPresentationOrder: 90 title: 'AVL'>
 	^ SpRoassal3InspectorPresenter new
 		canvas: self createCanvas;
-		yourself 
+		yourself
 ]
 
 { #category : #testing }
-RSAVL >> isBalanced [
+AVL >> isBalanced [
 	^ root isBalanced
 ]
 
 { #category : #testing }
-RSAVL >> isTotalBalanced [
+AVL >> isTotalBalanced [
 	^ root isTotalBalanced
 ]
 
 { #category : #private }
-RSAVL >> llrotationZ: z y: y x: x [ 
+AVL >> llrotationZ: z y: y x: x [ 
 	| a3 a4 new |
 	a3 := y right.
 	a4 := z right.
 	
-	new := RSAVLNode with: z contents.
+	new := AVLNode with: z contents.
 	new left: a3; right: a4.
 	z left: x; contents: y contents; right: new.
 	
 ]
 
 { #category : #private }
-RSAVL >> lrrotationZ: z y: y x: x [ 
+AVL >> lrrotationZ: z y: y x: x [ 
 	| a1 a2 a3 new |
 	a1 := y left.
 	a2 := x left.
 	a3 := x right.
-	new := RSAVLNode with: y contents.
+	new := AVLNode with: y contents.
 	new left: a1; right: a2.
 	y contents: x contents; left: new; right: a3.
 	
@@ -196,50 +196,50 @@ RSAVL >> lrrotationZ: z y: y x: x [
 ]
 
 { #category : #removing }
-RSAVL >> remove: oldObject ifAbsent: anExceptionBlock [
+AVL >> remove: oldObject ifAbsent: anExceptionBlock [
 	| toRemove path |
 	path := OrderedCollection new.
 	toRemove := root remove: oldObject path: path.
 	toRemove ifNil: [ ^ anExceptionBlock value ].
 	toRemove == root ifTrue: [ 
 		root := root successor: path.
-		root ifNil: [ root := RSAVLNilNode new ] ].
+		root ifNil: [ root := AVLNilNode new ] ].
 	self checkRemovingPath: path.
 	^ toRemove contents
 ]
 
 { #category : #private }
-RSAVL >> rlrotationZ: z y: y x: x [ 
+AVL >> rlrotationZ: z y: y x: x [ 
 	| a1 a2 a3 a4 new |
 	a1 := z left.
 	a2 := x left.
 	a3 := x right.
 	a4 := y right.
-	new := RSAVLNode with: y contents.
+	new := AVLNode with: y contents.
 	new left: a3; right: a4.
 	y contents: x contents; left: a2; right: new.
 	self rrrotationZ: z y: y x: new
 ]
 
 { #category : #accessing }
-RSAVL >> root [
+AVL >> root [
 	^ root
 ]
 
 { #category : #private }
-RSAVL >> rrrotationZ: z y: y x: x [
+AVL >> rrrotationZ: z y: y x: x [
 	"right right rotation"
 	| a1 a2 new |
 	a1 := z left.
 	a2 := y left.
 	
-	new := RSAVLNode with: z contents.
+	new := AVLNode with: z contents.
 	new left: a1; right: a2.
 	z left: new; right: x; contents: y contents
 	
 ]
 
 { #category : #search }
-RSAVL >> search: anInteger [ 
+AVL >> search: anInteger [ 
 	^ root search: anInteger
 ]
